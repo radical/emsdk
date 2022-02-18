@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <_ThisPackageVersion>${PackageVersion}</_ThisPackageVersion>
-    <LibClangPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(MSBuildThisFileDirectory)..\data\sdk\libclang.dylib</LibClangPath>
+    <_LibClangPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(MSBuildThisFileDirectory)..\data\sdk\lib\libclang.dylib</_LibClangPath>
     <_DataNodePath>$(MSBuildThisFileDirectory)..\data\node\bin\</_DataNodePath>
     <_DataNodeBinPath>$(_DataNodePath)bin\</_DataNodeBinPath>
   </PropertyGroup>
