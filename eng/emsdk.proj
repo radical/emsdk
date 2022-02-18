@@ -1,6 +1,8 @@
 <Project>
   <Import Project="$(RepoRoot)\Directory.Build.props" />
-  <Target Name="Build">
+  <Target Name="Build" DependsOnTargets="InstallEmscripten;PruneEmscripten" />
+
+  <Target Name="InstallEmscripten">
     <Error Condition="'$(PackageRID)' == ''" Text="PackageRID needs to be specified, e.g. 'osx-x64'!" />
 
     <PropertyGroup>
@@ -26,6 +28,10 @@
     <Message Importance="High" Text="Found node directory: $(NodeDirectory)" />
     <Message Importance="High" Text="Found python directory: $(PythonDirectory)" Condition="'$(UsesPythonFromEmsdk)' == 'true'" />
     <Message Importance="High" Text="Found upstream directory: $(UpstreamDirectory)" />
+  </Target>
+
+  <Target Name="PruneEmscripten">
+    <Error Condition="'$(PackageRID)' == ''" Text="PackageRID needs to be specified, e.g. 'osx-x64'!" />
 
     <Message Importance="High" Text="Pruning node modules in: $(UpstreamEmscriptenDirectory)" />
     <PropertyGroup>
@@ -142,6 +148,18 @@
     <Exec Condition="'$(StripCommand)' != ''" Command="$(StripCommand) $(ArtifactsObjDir)node/bin/node" IgnoreStandardErrorWarningFormat="true" />
     <Exec Condition="'$(StripCommand)' != ''" Command="$(StripCommand) %(UpstreamBinFiles.Identity) || true" IgnoreStandardErrorWarningFormat="true" />
   </Target>
+
+  <Target Name="_StageFilesForTransportPackage" AfterTargets="InstallEmscripten">
+    <ItemGroup>
+      <_FileToStage Include="$(UpstreamDirectory)\lib\libclang.dylib" TargetDir="sdk\lib\" Condition="$([MSBuild]::IsOSPlatform('OSX'))" />
+      <_FileToStage Include="$(NodeDirectory)\lib\**\*" TargetDir="node\lib\" />
+
+      <_FileToStage TargetPath="%(TargetDir)%(RecursiveDir)%(FileName)%(Extension)" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_FileToStage)" DestinationFiles="@(_FileToStage->'$(_StagingPath)%(TargetPath)')" />
+  </Target>
+
   <Target Name="Restore" />
   <Target Name="Test" />
   <Target Name="Pack" DependsOnTargets="Build">
@@ -151,6 +169,7 @@
     <MSBuild Projects="$(MSBuildThisFileDirectory)nuget\Microsoft.NET.Runtime.Emscripten.Sdk\Microsoft.NET.Runtime.Emscripten.Sdk.pkgproj" Targets="Build" />
     <MSBuild Projects="$(MSBuildThisFileDirectory)nuget\Microsoft.NET.Workload.Emscripten.Manifest\Microsoft.NET.Workload.Emscripten.Manifest.pkgproj" Targets="Build" Condition="'$(AssetManifestOS)' == '' or '$(AssetManifestOS)' == 'win'" />
     <MSBuild Projects="$(MSBuildThisFileDirectory)nuget\Microsoft.NET.Runtime.Emscripten.Sdk.Internal\Microsoft.NET.Runtime.Emscripten.Sdk.Internal.pkgproj" Targets="Build" Condition="'$(OS)' == 'Windows_NT'" />
+    <MSBuild Projects="$(MSBuildThisFileDirectory)nuget\Microsoft.NET.Runtime.Emscripten.Transport.Internal\Microsoft.NET.Runtime.Emscripten.Transport.Internal.pkgproj" Targets="Build" />
   </Target>
   <Import Project="$(RepoRoot)\Directory.Build.targets" />
 </Project>

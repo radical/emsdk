@@ -1,0 +1,44 @@
+<Project>
+  <PropertyGroup>
+    <_ThisPackageVersion>${PackageVersion}</_ThisPackageVersion>
+    <LibClangPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(MSBuildThisFileDirectory)..\data\sdk\libclang.dylib</LibClangPath>
+    <_DataNodePath>$(MSBuildThisFileDirectory)..\data\node\bin\</_DataNodePath>
+    <_DataNodeBinPath>$(_DataNodePath)bin\</_DataNodeBinPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmscriptenPrependPath Include="$(_DataNodeBinPath)" />
+  </ItemGroup>
+
+  <Target Name="_FixupForLocalBuild" AfterTargets="SetupEmscripten">
+    <Copy Condition="'$(_LibClangPath)' != ''"
+          SourceFiles="$(_LibClangPath)"
+          DestinationFolder="$(EmscriptenSdkToolsPath)lib"
+          SkipUnchangedFiles="true" />
+
+    <MakeDir Directories="$(_DataNodeBinPath)" />
+    <Exec Condition="!$([MSBuild]::IsOSPlatform('windows'))"
+          WorkingDirectory="$(_DataNodeBinPath)"
+          Command="ln -s ../lib/node_modules/npm/bin/npm-cli.js npm" />
+    <Exec Condition="!$([MSBuild]::IsOSPlatform('windows'))"
+          WorkingDirectory="$(_DataNodeBinPath)"
+          Command="ln -s ../lib/node_modules/npx/bin/npx-cli.js npx" />
+  </Target>
+
+  <ImportGroup Condition="$([MSBuild]::IsOSPlatform('linux'))">
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Sdk.linux-x64" Version="$(_ThisPackageVersion)" />
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Node.linux-x64" Version="$(_ThisPackageVersion)" />
+  </ImportGroup>
+
+  <ImportGroup Condition="$([MSBuild]::IsOSPlatform('osx'))">
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Sdk.osx-x64" Version="$(_ThisPackageVersion)" />
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Node.osx-x64" Version="$(_ThisPackageVersion)" />
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Python.osx-x64" Version="$(_ThisPackageVersion)" />
+  </ImportGroup>
+
+  <ImportGroup Condition="$([MSBuild]::IsOSPlatform('windows'))">
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Sdk.win-x64" Version="$(_ThisPackageVersion)" />
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Node.win-x64" Version="$(_ThisPackageVersion)" />
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Runtime.Emscripten.${EmscriptenVersion}.Python.win-x64" Version="$(_ThisPackageVersion)" />
+  </ImportGroup>
+</Project>
