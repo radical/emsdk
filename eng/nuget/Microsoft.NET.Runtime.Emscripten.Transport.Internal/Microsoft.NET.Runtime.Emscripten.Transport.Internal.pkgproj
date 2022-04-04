@@ -1,0 +1,47 @@
+<Project>
+  <Import Project="$(RepoRoot)\Directory.Build.props" />
+  <Import Project="$(NuGetPackageRoot)\microsoft.dotnet.build.tasks.packaging\$(MicrosoftDotNetBuildTasksPackagingVersion)\build\Microsoft.DotNet.Build.Tasks.Packaging.props" />
+  <Import Project="$(NuGetPackageRoot)\microsoft.dotnet.build.tasks.templating\$(MicrosoftDotNetBuildTasksTemplatingVersion)\build\Microsoft.DotNet.Build.Tasks.Templating.props" />
+  <Import Project="$([MSBuild]::GetPathOfFileAbove(Microsoft.NET.Runtime.Emscripten.Common.props))" />
+  <!--<Import Project="Microsoft.NET.Runtime.Emscripten.Transport.Internal.props" />-->
+
+  <PropertyGroup>
+    <PackageDescription>Internal package to carry full build version number.</PackageDescription>
+    <Description>Internal package to carry full build version number.</Description>
+    <IsShipping>false</IsShipping>
+    <VersionSuffix>$(_PreReleaseLabel)$(_BuildNumberLabels)</VersionSuffix>
+    <StableVersion></StableVersion>
+    <SkipUnixPermissionsFile>true</SkipUnixPermissionsFile>
+  </PropertyGroup>
+
+  <Target Name="_PrepareForPack" BeforeTargets="GetPackageFiles" Returns="@(PackageFile)">
+    <!-- Override the id to include the Emscripten version -->
+    <PropertyGroup>
+      <Id>Microsoft.NET.Runtime.Emscripten.$(EmscriptenVersion).Transport.Internal.$(PackageRID)</Id>
+      <TransportInternalPropsPath>$(IntermediateOutputPath)$(Id).props</TransportInternalPropsPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_StagedTransportFile Include="$(_StagingPath)\**\*" />
+      <_StagedTransportFile TargetPath="data\%(RecursiveDir)\" />
+
+      <PackageFile Include="@(_StagedTransportFile)" />
+      <PackageFile Include="$(TransportInternalPropsPath)" TargetPath="build\$([System.IO.Path]::GetFileName($(TransportInternalPropsPath)))" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_WriteManifestValues" AfterTargets="CalculatePackageVersion">
+    <ItemGroup>
+      <_WorkloadManifestValues Include="PackageVersion" Value="$(PackageVersion)" />
+      <_WorkloadManifestValues Include="EmscriptenVersion" Value="$(EmscriptenVersion)" />
+    </ItemGroup>
+
+    <GenerateFileFromTemplate
+      TemplateFile="Microsoft.NET.Runtime.Emscripten.Transport.Internal.props.in"
+      Properties="@(_WorkloadManifestValues->'%(Identity)=%(Value)')"
+      OutputPath="$(TransportInternalPropsPath)" />
+  </Target>
+
+  <Import Project="$(NuGetPackageRoot)\microsoft.dotnet.build.tasks.packaging\$(MicrosoftDotNetBuildTasksPackagingVersion)\build\Microsoft.DotNet.Build.Tasks.Packaging.targets" />
+  <Import Project="..\Directory.Build.targets" />
+</Project>

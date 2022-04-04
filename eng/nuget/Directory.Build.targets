@@ -24,7 +24,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="SanityCheckUnixFilePermissionsFile" AfterTargets="Deploy" Condition="!$([MSBuild]::IsOSPlatform('windows'))">
+  <Target Name="SanityCheckUnixFilePermissionsFile" AfterTargets="Deploy" Condition="!$([MSBuild]::IsOSPlatform('windows')) and '$(SkipUnixPermissionsFile)' != 'true'">
     <!-- $(PackageOutputPath)$(Id).$(PackageVersion).nupkg -->
     <PropertyGroup>
       <_UnpackedNuGetPath>$(ArtifactsObjDir)unpacked.$(Id)\</_UnpackedNuGetPath>
