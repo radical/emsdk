@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <_ThisPackageVersion>${PackageVersion}</_ThisPackageVersion>
-    <_LibClangPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(MSBuildThisFileDirectory)..\data\sdk\lib\libclang.dylib</_LibClangPath>
+    <!--<_LibClangPath Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(MSBuildThisFileDirectory)..\data\sdk\lib\libclang.dylib</_LibClangPath>-->
     <_DataNodePath>$(MSBuildThisFileDirectory)..\data\node\</_DataNodePath>
     <_DataNodeBinPath>$(_DataNodePath)bin\</_DataNodeBinPath>
   </PropertyGroup>
@@ -23,10 +23,10 @@
   </Target>
 
   <Target Name="_FixupForLocalBuildOnUnix" Condition="!$([MSBuild]::IsOSPlatform('windows'))">
-    <Copy Condition="'$(_LibClangPath)' != ''"
-      SourceFiles="$(_LibClangPath)"
-      DestinationFolder="$(EmscriptenSdkToolsPath)lib"
-      SkipUnchangedFiles="true" />
+    <!--<Copy Condition="'$(_LibClangPath)' != ''"-->
+      <!--SourceFiles="$(_LibClangPath)"-->
+      <!--DestinationFolder="$(EmscriptenSdkToolsPath)lib"-->
+      <!--SkipUnchangedFiles="true" />-->
 
     <MakeDir Directories="$(_DataNodeBinPath)" />
     <Exec Condition="!$([MSBuild]::IsOSPlatform('windows'))"
