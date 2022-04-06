@@ -159,8 +159,8 @@
   <Target Name="_StageFilesForTransportPackage" AfterTargets="InstallEmscripten">
     <ItemGroup>
       <!--<_FileToStage Include="$(UpstreamDirectory)\lib\libclang.dylib" TargetDir="sdk\lib\" Condition="$([MSBuild]::IsOSPlatform('OSX'))" />-->
-      <!--<_FileToStage Include="$(NodeDirectory)\lib\**\*" TargetDir="node\lib\" Condition="!$([MSBuild]::IsOSPlatform('windows'))" />-->
-      <!--<_FileToStage Include="$(NodeDirectory)\bin\node_modules\**\*" TargetDir="node\node_modules\" Condition="$([MSBuild]::IsOSPlatform('windows'))" />-->
+      <_FileToStage Include="$(NodeDirectory)\lib\**\*" TargetDir="node\lib\" Condition="!$([MSBuild]::IsOSPlatform('windows'))" />
+      <_FileToStage Include="$(NodeDirectory)\bin\node_modules\**\*" TargetDir="node\node_modules\" Condition="$([MSBuild]::IsOSPlatform('windows'))" />
 
       <_FileToStage TargetPath="%(TargetDir)%(RecursiveDir)%(FileName)%(Extension)" />
     </ItemGroup>
