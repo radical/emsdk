@@ -71,6 +71,6 @@
       <_ScriptLine Include="@(EmscriptenEnvVars -> 'export %(Identity)')" />
     </ItemGroup>
 
-    <WriteLinesToFile Lines="@(_ScriptLine)" File="$(ArtifactsObjDir)/emwrapper.sh" Overwrite="true" />
+    <!--<WriteLinesToFile Lines="@(_ScriptLine)" File="$(ArtifactsObjDir)/emwrapper.sh" Overwrite="true" />-->
   </Target>
 </Project>
